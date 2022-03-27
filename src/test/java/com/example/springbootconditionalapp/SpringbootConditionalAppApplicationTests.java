@@ -23,25 +23,24 @@ class SpringbootConditionalAppApplicationTests {
     public static GenericContainer<?> prodApp = new GenericContainer<>("prodapp")
             .withExposedPorts(8081);
 
-
     @BeforeAll
     public static void setUp() {
         //start containers
         devApp.start();
         prodApp.start();
-
     }
 
     @Test
-    void contextLoads() {
-        ResponseEntity<String> forEntityDev = restTemplate.getForEntity(
+    void contextLoadsDevapp() {
+        ResponseEntity<String> forEntity = restTemplate.getForEntity(
                 "http://localhost:" + devApp.getMappedPort(8080) + "/profile", String.class);
+        assertEquals(forEntity.getBody(), "Current profile is dev");
+    }
 
-        ResponseEntity<String> forEntityProd = restTemplate.getForEntity(
+    @Test
+    void contextLoadsProdapp() {
+        ResponseEntity<String> forEntity = restTemplate.getForEntity(
                 "http://localhost:" + prodApp.getMappedPort(8081) + "/profile", String.class);
-
-        assertEquals(forEntityDev.getBody(), "Current profile is dev");
-        assertEquals(forEntityProd.getBody(), "Current profile is production");
-
+        assertEquals(forEntity.getBody(), "Current profile is production");
     }
 }
